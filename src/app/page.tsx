@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import Image from 'next/image';
 
 interface Card {
@@ -26,7 +26,7 @@ interface FilterOption {
 
 const CardList: React.FC = () => {
   const [cardsData, setCardsData] = useState<Card[]>([]);
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [windowWidth, setWindowWidth] = useState(0); // 初期値を 0 に設定
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTab, setSelectedTab] = useState('name');
   const [selectedFilters, setSelectedFilters] = useState<{
@@ -76,11 +76,15 @@ const CardList: React.FC = () => {
     fetchData();
   }, []);
 
-  useEffect(() => {
+  // useLayoutEffect を使用してウィンドウ幅を初期化
+  useLayoutEffect(() => {
+    setWindowWidth(window.innerWidth);
+    // ウィンドウサイズが変更されたときにウィンドウ幅を更新
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
     };
     window.addEventListener('resize', handleResize);
+    // クリーンアップ関数
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
