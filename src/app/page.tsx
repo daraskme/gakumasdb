@@ -131,18 +131,6 @@ const CardList: React.FC = () => {
             style={{ color: '#000080' }} // 濃い青色
           />
         </div>
-        <div className="tab-buttons">
-          <button onClick={() => setSelectedTab('name')} style={{ color: '#000080' }}>名前</button>
-          <button onClick={() => setSelectedTab('分類')} style={{ color: '#000080' }}>分類</button>
-          <button onClick={() => setSelectedTab('カードタイプ')} style={{ color: '#000080' }}>カードタイプ</button>
-          <button onClick={() => setSelectedTab('プラン')} style={{ color: '#000080' }}>プラン</button>
-          <button onClick={() => setSelectedTab('消費対象')} style={{ color: '#000080' }}>消費対象</button>
-          <button onClick={() => setSelectedTab('消費')} style={{ color: '#000080' }}>消費</button>
-          <button onClick={() => setSelectedTab('メモリー')} style={{ color: '#000080' }}>メモリー</button>
-          <button onClick={() => setSelectedTab('制限')} style={{ color: '#000080' }}>制限</button>
-          <button onClick={() => setSelectedTab('レアリティ')} style={{ color: '#000080' }}>レアリティ</button>
-          <button onClick={() => setSelectedTab('PLv')} style={{ color: '#000080' }}>PLv</button>
-        </div>
         <div className="filter-container">
           {filterOptions.map(option => (
             <div key={option.key} className="filter-group">
@@ -223,23 +211,6 @@ const CardList: React.FC = () => {
           border: 1px solid #ccc;
           border-radius: 5px;
           color: #000080; // 濃い青色
-        }
-        .tab-buttons {
-          display: flex;
-          gap: 10px;
-          margin-bottom: 20px;
-        }
-        .tab-buttons button {
-          padding: 8px 16px;
-          border: 1px solid #ccc;
-          border-radius: 5px;
-          background-color: white;
-          cursor: pointer;
-          color: #000080; // 濃い青色
-        }
-        .tab-buttons button.active {
-          background-color: #ffbf00;
-          color: white;
         }
         .filter-container {
           display: flex;
