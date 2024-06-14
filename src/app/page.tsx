@@ -6,16 +6,33 @@ import Image from 'next/image';
 interface Card {
   number: string;
   name: string;
-  分類: string;
   カードタイプ: string;
   プラン: string;
+  パラメータ: string;
+  強化後パラメータ: string;
+  元気: string;
+  強化後元気: string;
+  やる気: string;
+  強化後やる気: string;
+  好印象: string;
+  強化後好印象: string;
+  集中: string;
+  強化後集中: string;
+  好調: string;
+  強化後好調: string;
+  絶好調: string;
+  強化後絶好調: string;
+  消費体力減少: string;
+  強化後消費体力減少: string;
+  体力回復: string;
+  強化後体力回復: string;
   消費対象: string;
   消費: string;
-  メモリー: string;
-  制限: string;
+  強化後消費: string;
+  他効果: string;
   レアリティ: string;
   PLv: string;
-  備考: string;
+  固有カード: string;
 }
 
 interface FilterOption {
@@ -42,7 +59,7 @@ const CardList: React.FC = () => {
     {
       key: 'プラン',
       label: 'プラン',
-      options: ['共通', 'ロジック', 'センス'],
+      options: ['フリー', 'ロジック', 'センス'],
     },
     {
       key: '消費対象',
@@ -68,8 +85,68 @@ const CardList: React.FC = () => {
       const response = await fetch('/cards.csv');
       const data = await response.text();
       const cards = data.split('\n').slice(1).map(line => {
-        const [number, name, 分類, カードタイプ, プラン, 消費対象, 消費, メモリー, 制限, レアリティ, PLv, 備考] = line.split(',');
-        return { number, name, 分類, カードタイプ, プラン, 消費対象, 消費, メモリー, 制限, レアリティ, PLv, 備考 } as Card;
+        const [
+          number,
+          name,
+          カードタイプ,
+          プラン,
+          パラメータ,
+          強化後パラメータ,
+          元気,
+          強化後元気,
+          やる気,
+          強化後やる気,
+          好印象,
+          強化後好印象,
+          集中,
+          強化後集中,
+          好調,
+          強化後好調,
+          絶好調,
+          強化後絶好調,
+          消費体力減少,
+          強化後消費体力減少,
+          体力回復,
+          強化後体力回復,
+          消費対象,
+          消費,
+          強化後消費,
+          他効果,
+          レアリティ,
+          PLv,
+          固有カード,
+        ] = line.split(',');
+        return {
+          number,
+          name,
+          カードタイプ,
+          プラン,
+          パラメータ,
+          強化後パラメータ,
+          元気,
+          強化後元気,
+          やる気,
+          強化後やる気,
+          好印象,
+          強化後好印象,
+          集中,
+          強化後集中,
+          好調,
+          強化後好調,
+          絶好調,
+          強化後絶好調,
+          消費体力減少,
+          強化後消費体力減少,
+          体力回復,
+          強化後体力回復,
+          消費対象,
+          消費,
+          強化後消費,
+          他効果,
+          レアリティ,
+          PLv,
+          固有カード,
+        } as Card;
       });
       setCardsData(cards);
     };
@@ -123,6 +200,12 @@ const CardList: React.FC = () => {
     }));
   };
 
+  const handleCardClick = (card: Card) => {
+    // 詳細表示のロジックを実装
+    // 例: モーダルを表示する、新しいページに遷移するなど
+    console.log('カードをクリックしました:', card);
+  };
+
   return (
     <div className="page-container">
       <div className="content-container">
@@ -161,7 +244,7 @@ const CardList: React.FC = () => {
         <div className="card-list-container">
           <div className="card-list" style={{ width: cardListWidth }}>
             {filteredCards.map((card, index) => (
-              <div key={index} className="card-container">
+              <div key={index} className="card-container" onClick={() => handleCardClick(card)}>
                 <Image
                   src={`/images/${card.number}.jpg`}
                   alt={card.name}
@@ -172,16 +255,19 @@ const CardList: React.FC = () => {
                 />
                 <div className="card-tooltip">
                   <div className="card-name">{card.name}</div>
-                  <div className="card-type">{card.分類} - {card.カードタイプ}</div>
+                  <div className="card-type">{card.カードタイプ}</div>
                   <div className="card-details">
-                    <div>プラン: {card.プラン}</div>
-                    <div>消費対象: {card.消費対象}</div>
-                    <div>消費: {card.消費}</div>
-                    <div>メモリー: {card.メモリー}</div>
-                    <div>制限: {card.制限}</div>
-                    <div>レアリティ: {card.レアリティ}</div>
-                    <div>PLv: {card.PLv}</div>
-                    <div>備考: {card.備考}</div>
+                    {/* - が含まれない項目だけ表示 */}
+                    {Object.entries(card).map(([key, value]) => {
+                      if (value !== '-' && value !== undefined && value !== null) {
+                        return (
+                          <div key={key}>
+                            {key}: {value}
+                          </div>
+                        );
+                      }
+                      return null;
+                    })}
                   </div>
                 </div>
               </div>
@@ -259,6 +345,7 @@ const CardList: React.FC = () => {
           position: relative;
           width: 96px;
           height: 96px;
+          cursor: pointer;
         }
         .card-image {
           cursor: pointer;
