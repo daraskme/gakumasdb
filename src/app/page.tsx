@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import Image from 'next/image';
+import ScoreCalculator from './ScoreCalculator'; // ScoreCalculator.tsx をインポート
 
 interface Card {
   number: string;
@@ -266,6 +267,9 @@ const CardList: React.FC = () => {
   return (
     <div className="page-container">
       <div className="content-container">
+        {/* スコア計算機を配置 */}
+        <ScoreCalculator />
+
         <div className="search-bar">
           <input
             type="text"
