@@ -6,7 +6,8 @@ const ScoreCalculator = () => {
   const [ダンス, setダンス] = useState<number>(0);
   const [ビジュアル, setビジュアル] = useState<number>(0);
   const [最終試験スコア, set最終試験スコア] = useState<number>(0);
-  const [計算結果, set計算結果] = useState<number>(0);
+  const [計算結果, set計算結果] = useState<number>(0); // 最終試験スコアを加算する前の値
+  const [評価点, set評価点] = useState<number>(0); // 最終的な評価点
   const [ランク, setランク] = useState<string>('');
   const [目標スコア, set目標スコア] = useState<number>(0);
   const [ランク別必要スコア, setランク別必要スコア] = useState<{
@@ -66,9 +67,79 @@ const ScoreCalculator = () => {
     }
   };
 
+  // 最終試験スコアを評価点に変換する関数
+  const calculateFinalExamScore = (targetScore: number) => {
+    // 最終試験スコアの評価点に変換
+    let finalExamScore = 0;
+    if (targetScore <= 5000) {
+      finalExamScore = Math.floor(targetScore * 0.3);
+    } else if (targetScore <= 10000) {
+      finalExamScore = Math.floor(
+        5000 * 0.3 + (targetScore - 5000) * 0.15
+      );
+    } else if (targetScore <= 20000) {
+      finalExamScore = Math.floor(
+        5000 * 0.3 + 5000 * 0.15 + (targetScore - 10000) * 0.08
+      );
+    } else if (targetScore <= 30000) {
+      finalExamScore = Math.floor(
+        5000 * 0.3 + 5000 * 0.15 + 10000 * 0.08 + (targetScore - 20000) * 0.04
+      );
+    } else if (targetScore <= 40000) {
+      finalExamScore = Math.floor(
+        5000 * 0.3 + 5000 * 0.15 + 10000 * 0.08 + 10000 * 0.04 + (targetScore - 30000) * 0.02
+      );
+    } else {
+      finalExamScore = Math.floor(
+        5000 * 0.3 + 5000 * 0.15 + 10000 * 0.08 + 10000 * 0.04 + 10000 * 0.02 + (targetScore - 40000) * 0.01
+      );
+    }
+
+    return finalExamScore;
+  };
+
+  // 最終試験スコアから逆算して元のスコアを計算する関数
+  const calculateFinalExamScoreReverse = (targetScore: number) => {
+    // 現在のスコアを取得
+    const currentScore =
+      get順位スコア(順位) + (ボーカル + ダンス + ビジュアル) * 2.3;
+
+    // 最終試験の評価点として必要な値を計算
+    const requiredFinalExamScore = targetScore - currentScore;
+
+    // 最終試験の評価点から必要な最終試験スコアを逆算
+    let finalExamScore = 0;
+    if (requiredFinalExamScore <= 1500) {
+      finalExamScore = Math.floor(requiredFinalExamScore / 0.3);
+    } else if (requiredFinalExamScore <= 2250) {
+      finalExamScore = Math.floor(
+        (requiredFinalExamScore - 1500) / 0.15 + 5000
+      );
+    } else if (requiredFinalExamScore <= 3050) {
+      finalExamScore = Math.floor(
+        (requiredFinalExamScore - 2250) / 0.08 + 10000
+      );
+    } else if (requiredFinalExamScore <= 3450) {
+      finalExamScore = Math.floor(
+        (requiredFinalExamScore - 3050) / 0.04 + 20000
+      );
+    } else if (requiredFinalExamScore <= 3650) {
+      finalExamScore = Math.floor(
+        (requiredFinalExamScore - 3450) / 0.02 + 30000
+      );
+    } else {
+      finalExamScore = Math.floor(
+        (requiredFinalExamScore - 3650) / 0.01 + 40000
+      );
+    }
+
+    return finalExamScore;
+  };
+
   // 計算結果とランクを更新する関数
   const updateScoreAndRank = () => {
-    set計算結果(calculateScore());
+    set計算結果(calculateFinalExamScore(最終試験スコア));
+    set評価点(calculateScore());
     setランク(getRank(calculateScore()));
     calculateRankScores();
   };
@@ -82,49 +153,10 @@ const ScoreCalculator = () => {
     // ステータス合計計算
     finalScore += (ボーカル + ダンス + ビジュアル) * 2.3;
 
-    // 最終試験スコア計算
+    // 最終試験スコア計算 (評価点に変換)
     finalScore += calculateFinalExamScore(最終試験スコア);
 
     return Math.floor(finalScore);
-  };
-
-  // 最終試験スコアを逆算する関数
-  const calculateFinalExamScore = (targetScore: number) => {
-    // 現在のスコアを取得
-    const currentScore =
-      get順位スコア(順位) + (ボーカル + ダンス + ビジュアル) * 2.3;
-
-    // 最終試験スコア計算
-    let finalExamScore = 0;
-    if (targetScore <= 5000) {
-      finalExamScore = Math.floor(targetScore / 0.3);
-    } else if (targetScore <= 10000) {
-      finalExamScore = Math.floor(
-        (targetScore - 5000 * 0.3) / 0.15 + 5000
-      );
-    } else if (targetScore <= 20000) {
-      finalExamScore = Math.floor(
-        (targetScore - 5000 * 0.3 - 5000 * 0.15) / 0.08 + 10000
-      );
-    } else if (targetScore <= 30000) {
-      finalExamScore = Math.floor(
-        (targetScore - 5000 * 0.3 - 5000 * 0.15 - 10000 * 0.08) /
-          0.04 +
-          20000
-      );
-    } else if (targetScore <= 40000) {
-      finalExamScore = Math.floor(
-        (targetScore - 5000 * 0.3 - 5000 * 0.15 - 10000 * 0.08 - 10000 * 0.04) /
-          0.02 +
-          30000
-      );
-    } else {
-      finalExamScore = Math.floor(
-        (targetScore - 5000 * 0.3 - 5000 * 0.15 - 10000 * 0.08 - 10000 * 0.04 - 10000 * 0.02) / 0.01 + 40000
-      );
-    }
-
-    return finalExamScore - currentScore;
   };
 
   const getRank = (score: number) => {
@@ -152,14 +184,15 @@ const ScoreCalculator = () => {
     const scores: { [rank: string]: number } = {};
     for (const rank of ["S", "A+", "A", "B+", "B", "C+", "C"]) {
       const requiredScore = getRankScore(rank);
-      scores[rank] = calculateFinalExamScore(requiredScore);
+      // 各ランクに必要な最終試験スコアを計算 (逆算)
+      scores[rank] = calculateFinalExamScoreReverse(requiredScore);
     }
     setランク別必要スコア(scores);
   };
 
   const handleReverseCalculate = () => {
     const targetScore = getRankScore(ランク);
-    set目標スコア(calculateFinalExamScore(targetScore));
+    set目標スコア(calculateFinalExamScoreReverse(targetScore));
   };
 
   const getRankScore = (rank: string) => {
@@ -245,6 +278,7 @@ const ScoreCalculator = () => {
       </div>
 
       <p style={{ color: '#000080' }}>計算結果: {計算結果}</p>
+      <p style={{ color: '#000080' }}>評価点: {評価点}</p>
       <p style={{ color: '#000080' }}>ランク: {ランク}</p>
 
       {/* 逆算機能 */}
