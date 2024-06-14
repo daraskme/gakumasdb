@@ -43,9 +43,8 @@ interface FilterOption {
 
 const CardList: React.FC = () => {
   const [cardsData, setCardsData] = useState<Card[]>([]);
-  const [windowWidth, setWindowWidth] = useState(0); // 初期値を 0 に設定
+  const [windowWidth, setWindowWidth] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedTab, setSelectedTab] = useState('name');
   const [selectedFilters, setSelectedFilters] = useState<{
     [key: string]: string[];
   }>({});
@@ -77,6 +76,51 @@ const CardList: React.FC = () => {
       key: 'レアリティ',
       label: 'レアリティ',
       options: ['白札', '青札', '金札', '虹札'],
+    },
+    {
+      key: 'パラメータ',
+      label: '効果',
+      options: ['パラメータ'],
+    },
+    {
+      key: '元気',
+      label: '　',
+      options: ['元気'],
+    },
+    {
+      key: 'やる気',
+      label: '　',
+      options: ['やる気'],
+    },
+    {
+      key: '好印象',
+      label: '　',
+      options: ['好印象'],
+    },
+    {
+      key: '集中',
+      label: '　',
+      options: ['集中'],
+    },
+    {
+      key: '好調',
+      label: '　',
+      options: ['好調'],
+    },
+    {
+      key: '絶好調',
+      label: '　',
+      options: ['絶好調'],
+    },
+    {
+      key: '消費体力減少',
+      label: '　',
+      options: ['消費体力減少'],
+    },
+    {
+      key: '体力回復',
+      label: '　',
+      options: ['体力回復'],
     },
   ];
 
@@ -172,17 +216,31 @@ const CardList: React.FC = () => {
 
   const filteredCards = cardsData.filter(card => {
     const searchTermLower = searchTerm.toLowerCase();
-    const matchesSearch =
-      selectedTab === 'name'
-        ? card.name.toLowerCase().includes(searchTermLower)
-        : card[selectedTab as keyof Card].toLowerCase().includes(searchTermLower);
+    // すべての項目で検索
+    const matchesSearch = Object.values(card)
+      .map(value => value.toLowerCase())
+      .some(value => value.includes(searchTermLower));
 
     const matchesFilters = Object.entries(selectedFilters).every(
       ([key, values]) => {
         if (values.length === 0) {
           return true;
         }
-        return values.includes(card[key as keyof Card]);
+
+        // フィルターオプションのキーに基づいてフィルター条件を変える
+        if (
+          key === 'カードタイプ' ||
+          key === 'プラン' ||
+          key === '消費対象' ||
+          key === 'レアリティ'
+        ) {
+          // キーが "カードタイプ", "プラン", "消費対象", "レアリティ" の場合、
+          // オプションの値が一致するかどうかでフィルター
+          return values.includes(card[key as keyof Card]);
+        } else {
+          // それ以外のキーの場合、値が '-' ではないかどうかでフィルター
+          return card[key as keyof Card] !== '-' && card[key as keyof Card] !== undefined && card[key as keyof Card] !== null;
+        }
       }
     );
 
@@ -202,7 +260,6 @@ const CardList: React.FC = () => {
 
   const handleCardClick = (card: Card) => {
     // 詳細表示のロジックを実装
-    // 例: モーダルを表示する、新しいページに遷移するなど
     console.log('カードをクリックしました:', card);
   };
 
@@ -221,7 +278,7 @@ const CardList: React.FC = () => {
         <div className="filter-container">
           {filterOptions.map(option => (
             <div key={option.key} className="filter-group">
-              <div className="filter-label">{option.label}</div>
+              <div className="filter-label" style={{ color: '#000080' }}>{option.label}</div> {/* ラベルの色を濃い青色に変更 */}
               <div className="filter-options">
                 {option.options.map(filterValue => (
                   <button
@@ -255,13 +312,13 @@ const CardList: React.FC = () => {
                 />
                 <div className="card-tooltip">
                   <div className="card-name">{card.name}</div>
-                  <div className="card-type">{card.カードタイプ}</div>
+                  <div className="card-type" style={{ color: '#000080' }}>{card.カードタイプ}</div>
                   <div className="card-details">
                     {/* - が含まれない項目だけ表示 */}
                     {Object.entries(card).map(([key, value]) => {
                       if (value !== '-' && value !== undefined && value !== null) {
                         return (
-                          <div key={key}>
+                          <div key={key} style={{ color: '#000080' }}> {/* 詳細項目の色を濃い青色に変更 */}
                             {key}: {value}
                           </div>
                         );
@@ -305,7 +362,7 @@ const CardList: React.FC = () => {
         .filter-container {
           display: flex;
           flex-wrap: wrap;
-          gap: 20px;
+          gap: 5px; /* ボタン間隔を小さく */
           margin-bottom: 20px;
         }
         .filter-group {
@@ -314,6 +371,7 @@ const CardList: React.FC = () => {
         }
         .filter-label {
           font-weight: bold;
+          color: #000080; /* ラベルの色を濃い青色に変更 */
         }
         .filter-options {
           display: flex;
@@ -373,6 +431,7 @@ const CardList: React.FC = () => {
         }
         .card-type {
           margin-bottom: 10px;
+          color: #000080; /* 濃い青色 */
         }
         .card-details {
           display: flex;
